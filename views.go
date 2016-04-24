@@ -19,8 +19,8 @@ type View struct {
 type ViewParams struct {
 	IncludeDocs    bool     `url:"include_docs"`
 	Limit          int      `url:"limit"`
-	Reduce         bool     `url:"reduce"`
-	GroupLevel     int      `url:"group_level"`
+	Reduce         *bool    `url:"reduce,omitempty"`
+	GroupLevel     *int     `url:"group_level,omitempty"`
 	StartKeyString []string `url:"start_key"`
 	StartKeyInt    []int64  `url:"start_key"`
 	EndKeyString   []string `url:"end_key"`
@@ -39,7 +39,12 @@ func NewView(ddoc, name string) *View {
 // GetViewResults gets a views results
 func (db *Database) GetViewResults(v *View, results interface{}) error {
 	qp, _ := query.Values(v.Params)
-	endpoint := fmt.Sprintf("/%s/_design/%s/_view/%s?%s&group=true", db.Name(), v.ddoc, v.name, qp.Encode())
+	endpoint := fmt.Sprintf("/%s/_design/%s/_view/%s?%s", db.Name(), v.ddoc, v.name, qp.Encode())
+	if v.Params.Reduce != nil {
+		endpoint = fmt.Sprintf("/%s/_design/%s/_view/%s?%s&group=true", db.Name(), v.ddoc, v.name, qp.Encode())
+
+	}
+
 	resp, err := db.client.doRequest("GET", endpoint, nil, nil)
 	if err != nil {
 		return err

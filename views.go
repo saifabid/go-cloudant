@@ -57,16 +57,11 @@ func (db *Database) GetViewResults(v *View, results interface{}) error {
 	buf := new(bytes.Buffer)
 	_, err = buf.ReadFrom(resp.Body)
 
-	//fmt.Printf(buf.String()) // NOTE: uncomment this line when debugging results
+	//	fmt.Printf(buf.String()) // NOTE: uncomment this line when debugging results
 
 	// for test coverage purposes, performing nil check using non-idiomatic pattern
-	var objmap map[string]*json.RawMessage
 	if err == nil {
-		err = json.Unmarshal(buf.Bytes(), &objmap)
-	}
-
-	if err == nil {
-		err = json.Unmarshal(*objmap["rows"], results)
+		err = json.Unmarshal(buf.Bytes(), results)
 	}
 
 	return err
